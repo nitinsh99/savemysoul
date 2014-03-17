@@ -10,7 +10,7 @@ import android.graphics.YuvImage;
 import android.os.Environment;
 import android.widget.Toast;
 
-public class RecordData {
+public class RecordAccelData {
 	
 	private float[] accValue;
 	private float[] gyValue;
@@ -19,10 +19,10 @@ public class RecordData {
 	FileOutputStream fOut;
 	OutputStreamWriter myOutWriter;
 	
-	public RecordData(){
+	public RecordAccelData(){
 		try{
 			String path=Environment.getExternalStorageDirectory().getPath();
-			myFile = new File("/sdcard/mysdfile.txt");
+			myFile = new File("/sdcard/Accelerometer.txt");
 			myFile.createNewFile();
 			fOut = new FileOutputStream(myFile);
 			myOutWriter = new OutputStreamWriter(fOut);
@@ -40,6 +40,8 @@ public class RecordData {
 	
 	public void closeFile(){
 		try {
+			String currentDateTimeString = java.text.DateFormat.getDateTimeInstance().format(new Date());			
+			myOutWriter.append(currentDateTimeString+"    "+"Data collection ends"+"\n\n");
 			myOutWriter.close();
 			fOut.close();
 		} catch (IOException e) {

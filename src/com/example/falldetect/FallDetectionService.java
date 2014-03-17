@@ -26,6 +26,8 @@ public class FallDetectionService extends Service implements SensorEventListener
 	private ArrayList<double []> lastaccValue;
 	private ArrayList<double []> lastgyValue;
 	
+	private static double[] fallData= new double[3];
+	
 	private final ArrayList<double []> newaccValue=new ArrayList<double[]>();
 	private final ArrayList<double []> newgyValue=new ArrayList<double[]>();
 
@@ -39,7 +41,8 @@ public class FallDetectionService extends Service implements SensorEventListener
 	private static final double[] gravity= new double[3];
 	private static final String TAG = FallDetectionService.class.getSimpleName();;
 	
-	RecordData handle;
+	RecordAccelData handle1;
+	RecordGyData handle2;
 
 	
 	
@@ -60,7 +63,8 @@ public class FallDetectionService extends Service implements SensorEventListener
 			//perform analysis part should be here
 			if (this.analyzeFall()) {
 				try {
-					handle.appData("Yes fall detected"+"\n");
+					handle1.appData("Yes fall detected   "+fallData[0]+" "+fallData[1]+" "+fallData[2]+"\n");
+					handle2.appData("Yes fall detected   "+fallData[0]+" "+fallData[1]+" "+fallData[2]+"\n");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -84,7 +88,7 @@ public class FallDetectionService extends Service implements SensorEventListener
 				MainActivity.text1.setText(s);
 				this.newaccValue.add(values);
 				try {
-					handle.appData(s);
+					handle1.appData(s);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -104,7 +108,7 @@ public class FallDetectionService extends Service implements SensorEventListener
 				String s= "Gyroscope:-  "+x+"   "+y+"   "+z+"\n";
 				MainActivity.text2.setText(s);
 				try {
-					handle.appData(s);
+					handle2.appData(s);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -140,7 +144,8 @@ public class FallDetectionService extends Service implements SensorEventListener
 		Log.i(TAG, "Service creating");
 		MainActivity.text1.setText("File got a call");
 		Toast.makeText(this, "File Got a call", Toast.LENGTH_LONG).show();
-		handle=new RecordData();
+		handle1=new RecordAccelData();
+		handle2= new RecordGyData();
 		this.StartSensors();
 		
 	}
@@ -151,7 +156,8 @@ public class FallDetectionService extends Service implements SensorEventListener
 		Toast.makeText(this, "FallDetection Service Destroyed", Toast.LENGTH_LONG).show();
 		this.lock.release();
 		this.stopSensors();
-		handle.closeFile();
+		handle1.closeFile();
+		handle2.closeFile();
 	}
 	
 	@Override
@@ -223,6 +229,7 @@ public class FallDetectionService extends Service implements SensorEventListener
 			}
 
 			double value = -0.139 + 0.0195 * maxHori + 0.0163 * maxMovement;
+			fallData[0]=value;
 			return value >= 0.05;
 		}
 
@@ -237,7 +244,7 @@ public class FallDetectionService extends Service implements SensorEventListener
 						}
 
 				}
-				
+				fallData[1]=maxValue;
 				return maxValue > 2.4543;
 
 			}
@@ -269,7 +276,7 @@ public class FallDetectionService extends Service implements SensorEventListener
 
 				double value = TIntegration.integrate(x, y);
 				System.out.println("" + value);
-
+				fallData[2]=value;
 				return value > 0.872664626;
 
 			}
