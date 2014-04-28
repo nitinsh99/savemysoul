@@ -1,4 +1,4 @@
-
+#!/usr/local/bin/php
 <?php
 
 include_once("connect2db.php");
@@ -27,8 +27,8 @@ var longArr = new Array();
 
 <?php
 $latArray = array();
-$query1 = "select latitude from location";
-$result=mysql_query($query1,$handler);
+$query1 = "select `lat` from location";
+$result=mysql_query($query1);
 while($row = mysql_fetch_array($result)) {
     // Append to the array
     $latArray[] = $row[0];   
@@ -42,14 +42,55 @@ while($row = mysql_fetch_array($result)) {
  </script>
 
 
+
+<?php
+$idArray = array();
+$query4 = "select `id` from location";
+$result4=mysql_query($query4);
+while($row = mysql_fetch_array($result4)) {
+    // Append to the array
+    $idArray[] = $row[0];   
+}
+
+?>
+
+<script type="text/javascript">
+
+  idArr= <?php echo json_encode($idArray ); ?>;
+ </script>
+
+<?php
+$flagArray = array();
+$query3 = "select `flag` from location";
+$result3=mysql_query($query3);
+while($row = mysql_fetch_array($result3)) {
+    // Append to the array
+    $flagArray[] = $row[0];   
+	if($row[0]==1)
+{
+
+$result =mysql_query("select `id` from location where `flag`=$row[0]");
+ echo mysql_result($result,0);
+ }
+}
+
+?>
+
+<script type="text/javascript">
+
+  flagArr= <?php echo json_encode($flagArray ); ?>;
+ </script>
+
+
 <?php
 $longArray = array();
-$query2 = "select longitude from location";
-$result=mysql_query($query2,$handler);
+$query2 = "select `long` from location";
+$result=mysql_query($query2);
 while($row = mysql_fetch_array($result)) {
     // Append to the array
     $longArray[] = $row[0];   
 }
+
 ?>
 
 <script type="text/javascript">
@@ -79,6 +120,8 @@ var meanLong = longSum/counter;
 document.write(parseFloat(meanLat)+'\n');
 document.write(parseFloat(meanLong));
 </script>
+
+
 <script>
 function initialize()
 {
@@ -90,15 +133,27 @@ var mapProp = {
   };
 var map=new google.maps.Map(document.getElementById("googleMap")
   ,mapProp);
+
+for (var i=0;i<counter;i++)
+{
+
+
+
+
 var marker = new google.maps.Marker({
-      position: new google.maps.LatLng(parseFloat(meanLat),parseFloat(meanLong)), 
+      position: new google.maps.LatLng(parseFloat(latArr[i]),parseFloat(longArr[i])), 
       map: map, 
-      title:"Hello World!"
+      title:"Victim"
+
     }); 
+}
+
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
 </script>
+
+
 </head>
 
 <body>
