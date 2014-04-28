@@ -11,6 +11,7 @@ include_once("connect2db.php");
 <head>
 
 <META HTTP-EQUIV="refresh" CONTENT="20">
+<script type="text/javascript" src="Distance.js"></script>
 
 <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyC3wzMp-2Ss2iijSy7mBBKAcDZXOdz-FYg&sensor=false">
 </script>
