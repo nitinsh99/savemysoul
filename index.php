@@ -1,31 +1,30 @@
+#!/usr/local/bin/php
 
 <?php
-
 include_once("connect2db.php");
  $id= $_POST["id"];
-  $lat =$_POST["latitude"]; 
-  $long = $_POST["longitude"];
-echo "your message is recieved";
+  $lat =$_POST["lat"]; 
+  $long = $_POST["long"];
+  $flag = $_POST["flag"];
 
-//$query = "select * from location where id = '$id'";
+$q = "select * from location where id='$id'";
+$r = mysql_query($q);
 
-$query="select * from location where id='$id'";
-$result=mysql_query($query,$handler);
-if(mysql_num_rows($result)==0)
+if(mysql_num_rows($r)==0)
 {
-//echo "no location from correcponding id\n";
-$query="insert into location(id,latitude,longitude)  values('$id','$lat','$long')";
-mysql_query($query,$handler);
-//echo "entry stored \n";
+$query="insert into location(`id`,`lat`,`long`,`flag`) values('$id','$lat','$long','$flag')";
+
+mysql_query($query);
 }
 
 else
 {
-$query = "update location set latitude='$lat',longitude='$long' where id='$id'";
-mysql_query($query,$handler);
-//echo "entry updated\n";
+$q1 = "update location set `lat`='$lat',`long`='$long',`flag`='$flag' where `id`='$id'";
+mysql_query($q1);
 }
-header("location: server.php"); 
+$result =mysql_query("select `id` from location where `flag`='2'");
+ echo mysql_result($result,0);
+//header("location: server.php"); 
 
 ?>
 
