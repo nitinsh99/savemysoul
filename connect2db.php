@@ -1,7 +1,12 @@
-<?php 
-$handler=mysql_connect("localhost","root") or die("could not connect to mysql");
-print($handler);
-if($handler!=NUll)
-mysql_select_db("savemysoul",$handler);
-print("connected to database");
+#!/usr/local/bin/php
+
+<?php
+
+$conn  = mysql_connect('mysql.cise.ufl.edu', 'rrohit', 'cps2014spring') or 
+   die ('Could not connect:' . mysql_error());
+
+mysql_select_db('maindb') or die('Could not select database');
+
+
+
 ?>
