@@ -1,27 +1,66 @@
 package com.example.falldetect;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class FallDetectionService extends Service implements SensorEventListener {
+public class FallDetectionService extends Service implements SensorEventListener{
 	
 	private Sensor accelerometer;
 	private Sensor gyroscope;
+	public Http_client h;
 	private SensorManager manager;
+	public String mPhoneNumber;
+	public static boolean fallDetect= false;
+    	
+
+	public static String latitude;
+	public static String longitude;
 	
 	private ArrayList<double []> lastaccValue;
 	private ArrayList<double []> lastgyValue;
@@ -44,8 +83,7 @@ public class FallDetectionService extends Service implements SensorEventListener
 	RecordAccelData handle1;
 	RecordGyData handle2;
 
-	
-	
+		
 
 	@Override
 	public void onAccuracyChanged(Sensor arg0, int arg1) {
@@ -63,12 +101,37 @@ public class FallDetectionService extends Service implements SensorEventListener
 			//perform analysis part should be here
 			if (this.analyzeFall()) {
 				try {
+					
+
+						    	
+
 					handle1.appData("Yes fall detected   "+fallData[0]+" "+fallData[1]+" "+fallData[2]+"\n");
 					handle2.appData("Yes fall detected   "+fallData[0]+" "+fallData[1]+" "+fallData[2]+"\n");
+					Toast.makeText(this, "Fall detected", Toast.LENGTH_LONG).show();
+					this.h =new Http_client();
+
+					
+					
+					Intent dialog = new Intent(this, popUp.class);
+					dialog.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					startActivity(dialog);
+					
+						h.execute(mPhoneNumber,"1");
+						fallDetect=true;
+						    
+					//new MainActivity().sendData("fall detected");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+			}
+			else{
+				if(!fallDetect){
+					this.h =new Http_client();
+					h.execute(mPhoneNumber,"2");
+					fallDetect= false;
+					}
+				
 			}
 
 				this.newaccValue.clear();
@@ -147,6 +210,15 @@ public class FallDetectionService extends Service implements SensorEventListener
 		handle1=new RecordAccelData();
 		handle2= new RecordGyData();
 		this.StartSensors();
+		TelephonyManager tMgr = (TelephonyManager)getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+		 mPhoneNumber = tMgr.getLine1Number();
+
+		
+		
+		 
+
+		 
+
 		
 	}
 	
@@ -280,8 +352,12 @@ public class FallDetectionService extends Service implements SensorEventListener
 				return value > 0.872664626;
 
 			}
+			
+			
+			
+			
 
-
+			
 	
 	
 	
